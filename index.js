@@ -1,6 +1,33 @@
 const express = require('express')
+const mongoose = require('mongoose')
 const cors = require('cors')
 const app = express()
+
+const password = ""
+
+const url = 
+``
+
+
+    
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+
+const noteSchema = new mongoose.Schema({
+  content: String,
+  date: Date,
+  important: Boolean,
+})
+
+//const Note = mongoose.model('Note', noteSchema)
+const Note = require('./models/note')
+
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
 
 app.use(cors())
 app.use(express.json())
@@ -20,33 +47,14 @@ const unknownEndpoint = (request, response) => {
 
 app.use(requestLogger)
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    date: "2020-01-10T17:30:31.098Z",
-    important: true
-  },
-  {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2020-01-10T18:39:34.091Z",
-    important: false
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2020-01-10T19:20:14.298Z",
-    important: true
-  }
-]
-
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/notes', (req, res) => {
-  res.json(notes)
+app.get('/api/notes', (request, response) => {
+  Note.find({}).then(notes => {
+    response.json(notes)
+  })
 })
 
 const generateId = () => {
@@ -100,3 +108,24 @@ const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+
+// let notes = [
+//   {
+//     id: 1,
+//     content: "HTML is easy",
+//     date: "2020-01-10T17:30:31.098Z",
+//     important: true
+//   },
+//   {
+//     id: 2,
+//     content: "Browser can execute only Javascript",
+//     date: "2020-01-10T18:39:34.091Z",
+//     important: false
+//   },
+//   {
+//     id: 3,
+//     content: "GET and POST are the most important methods of HTTP protocol",
+//     date: "2020-01-10T19:20:14.298Z",
+//     important: true
+//   }
+// ]
